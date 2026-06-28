@@ -1,75 +1,159 @@
-# EduVault AI
+# MNITVerse 🚀
 
-College resource sharing platform for students — upload/download notes, PYQs, books & syllabi with AI-powered study tools.
+**Made by MNITians, for MNITians.**
 
-## Features
+MNITVerse is a college resource-sharing platform built exclusively for MNIT Jaipur students, enabling them to upload, discover, and access notes, PYQs, books, and academic resources with AI-powered study tools.
 
-**Phase 1:** Upload/Download Resources · Authentication · Bookmarks · Ratings  
-**Phase 2:** Gemini Notes Summary · PYQ Analysis · Viva Question Generator  
-**Phase 3:** Subject Recommendations · Trending Resources · Analytics Dashboard  
+## ✨ Features
 
-## Tech Stack
+### 📚 Resource Management
 
-- **Frontend:** React 19, Vite, Tailwind CSS 4, React Router
-- **Backend:** FastAPI, Motor (MongoDB), JWT Auth
-- **AI:** Google Gemini 2.5 Flash
-- **Database:** MongoDB Atlas (`eduvault`)
+* Upload and download notes, books, and PYQs
+* Resource categorization by branch and year
+* Bookmark favorite resources
+* Rating and review system
+* Trending resources section
 
-## Setup
+### 🤖 AI-Powered Study Tools
 
-### 1. MongoDB Atlas
+* Gemini AI Notes Summarizer
+* PYQ Analysis & Pattern Detection
+* Viva Question Generator
+* Smart Subject Recommendations
 
-1. Create a free cluster at [mongodb.com/atlas](https://www.mongodb.com/atlas)
-2. Create database: `eduvault`
-3. Copy connection string
+### 👨‍🎓 Student Platform
 
-### 2. Gemini API
+* Secure JWT Authentication
+* Branch-wise syllabus access
+* Personalized dashboard
+* Analytics and insights
 
-1. Get API key from [Google AI Studio](https://aistudio.google.com/apikey)
-2. `pip install google-generativeai`
+## 🛠️ Tech Stack
 
-### 3. Backend
+### Frontend
+
+* React 19
+* Vite
+* Tailwind CSS 4
+* React Router DOM
+* Axios
+
+### Backend
+
+* FastAPI
+* MongoDB Atlas
+* Motor (Async MongoDB Driver)
+* JWT Authentication
+* Passlib + Bcrypt
+
+### AI Integration
+
+* Google Gemini 2.5 Flash
+
+### Deployment
+
+* Frontend: Vercel
+* Backend: Render
+* Database: MongoDB Atlas
+
+---
+
+## 🚀 Local Setup
+
+### 1. Clone Repository
+
+```bash
+git clone https://github.com/SinghJayant18/MNITVerse.git
+cd MNITVerse
+```
+
+### 2. Backend Setup
 
 ```bash
 cd backend
+
 python -m venv venv
-source venv/bin/activate   # Windows: venv\Scripts\activate
+source venv/bin/activate      # Windows: venv\Scripts\activate
+
 pip install -r requirements.txt
+
 cp .env.example .env
-# Edit .env with your MONGO_URI and GEMINI_API_KEY
+```
+
+Update `.env`:
+
+```env
+MONGO_URI=your_mongodb_uri
+GEMINI_API_KEY=your_gemini_api_key
+JWT_SECRET=your_secret_key
+CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
+```
+
+Start backend:
+
+```bash
 uvicorn app.main:app --reload --port 8000
 ```
 
-### 4. Frontend
+---
+
+### 3. Frontend Setup
 
 ```bash
 cd frontend
+
 npm install
 npm run dev
 ```
 
-Open **http://localhost:5173**
+Open:
 
-## Environment Variables
-
-```env
-MONGO_URI=mongodb+srv://user:pass@cluster.mongodb.net/eduvault
-GEMINI_API_KEY=your_key
-JWT_SECRET=your-secret-key
+```text
+http://localhost:5173
 ```
 
-## API Endpoints
+---
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/auth/register` | Student signup |
-| POST | `/auth/login` | Login |
-| GET | `/resources` | Browse resources |
-| POST | `/resources` | Upload file |
-| GET | `/resources/{id}/download` | Download |
-| POST | `/summarize` | AI summary |
-| POST | `/ai/analyze-pyq` | PYQ analysis |
-| POST | `/ai/viva-questions` | Viva questions |
-| GET | `/analytics/dashboard` | Stats |
+## 🌐 Production Deployment
 
-Full docs at **http://localhost:8000/docs**
+### Frontend (Vercel)
+
+```env
+VITE_BACKEND_URL=https://mnitverse-backend.onrender.com
+```
+
+### Backend (Render)
+
+```env
+CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173,https://mnit-verse.vercel.app
+```
+
+---
+
+## 📌 API Endpoints
+
+| Method | Endpoint                       | Description              |
+| ------ | ------------------------------ | ------------------------ |
+| POST   | `/auth/register`               | Student registration     |
+| POST   | `/auth/login`                  | Student login            |
+| GET    | `/auth/me`                     | Current user             |
+| GET    | `/resources`                   | Browse resources         |
+| POST   | `/resources`                   | Upload resources         |
+| GET    | `/resources/{id}/download`     | Download resource        |
+| POST   | `/summarize`                   | AI summary               |
+| POST   | `/ai/analyze-pyq`              | PYQ analysis             |
+| POST   | `/ai/viva-questions`           | Viva question generation |
+| GET    | `/analytics/dashboard`         | Dashboard analytics      |
+| GET    | `/analytics/syllabus/{branch}` | Branch syllabus          |
+
+---
+
+## 🎯 Vision
+
+MNITVerse aims to become the one-stop academic ecosystem for MNIT Jaipur students by combining collaborative resource sharing with modern AI-powered learning tools.
+
+**One Platform, Endless Learning.**
+
+---
+
+Made with ❤️ by MNITians, for MNITians.
