@@ -1,7 +1,8 @@
 import axios from 'axios'
 
+const BASE_URL = import.meta.env.VITE_BACKEND_URL || '/api'
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: BASE_URL,
   headers: { 'Content-Type': 'application/json' },
 })
 
@@ -26,7 +27,7 @@ export const resourcesAPI = {
     api.post('/resources', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     }),
-  download: (id) => `/api/resources/${id}/download`,
+    download: (id) => `${BASE_URL}/resources/${id}/download`,
   rate: (id, rating) => api.post(`/resources/${id}/rate`, { rating }),
 }
 
