@@ -23,6 +23,23 @@ class UserLogin(BaseModel):
     password: str
 
 
+class CPStats(BaseModel):
+    lc_solved_easy: int = 0
+    lc_solved_medium: int = 0
+    lc_solved_hard: int = 0
+    lc_solved_score: int = 0
+    lc_solved_total: int = 0
+    lc_contest_rating: float = 0.0
+    overall_score: float = 0.0
+    lc_valid: bool = True
+    last_updated: datetime | None = None
+
+
+class UpdateCPUsernames(BaseModel):
+    leetcode_username: str | None = None
+    codeforces_username: str | None = None
+
+
 class UserResponse(BaseModel):
     id: str
     name: str
@@ -30,6 +47,9 @@ class UserResponse(BaseModel):
     branch: str
     year: str
     created_at: datetime
+    leetcode_username: str | None = None
+
+    cp_stats: CPStats | None = None
 
 
 class TokenResponse(BaseModel):

@@ -8,7 +8,7 @@ from fastapi.staticfiles import StaticFiles
 from app.config import settings
 from app.database import close_db, connect_db
 from app.models.schemas import SummarizeResponse, TextInput
-from app.routes import ai, analytics, auth, bookmarks, resources
+from app.routes import ai, analytics, auth, bookmarks, leaderboard, resources
 from app.services.gemini import summarize_text
 
 
@@ -40,6 +40,7 @@ app.include_router(resources.router)
 app.include_router(bookmarks.router)
 app.include_router(ai.router)
 app.include_router(analytics.router)
+app.include_router(leaderboard.router)
 
 if os.path.isdir(settings.upload_dir):
     app.mount("/uploads", StaticFiles(directory=settings.upload_dir), name="uploads")

@@ -16,6 +16,9 @@ def serialize_user(doc: dict) -> dict:
         "branch": doc.get("branch", "CSE"),
         "year": doc.get("year", "1"),
         "created_at": doc.get("created_at"),
+        "leetcode_username": doc.get("leetcode_username"),
+        "codeforces_username": doc.get("codeforces_username"),
+        "cp_stats": doc.get("cp_stats"),
     }
 
 

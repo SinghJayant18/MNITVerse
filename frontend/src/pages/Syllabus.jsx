@@ -42,11 +42,10 @@ export default function Syllabus() {
           <button
             key={b}
             onClick={() => setBranch(b)}
-            className={`rounded-xl px-4 py-2 text-sm font-medium transition ${
-              branch === b
-                ? 'bg-brand-600 text-white'
-                : 'glass text-slate-400 hover:text-white'
-            }`}
+            className={`rounded-xl px-4 py-2 text-sm font-medium transition ${branch === b
+              ? 'bg-brand-600 text-white'
+              : 'glass text-slate-400 hover:text-white'
+              }`}
           >
             {b}
           </button>

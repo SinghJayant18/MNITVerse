@@ -78,4 +78,10 @@ export const analyticsAPI = {
   syllabus: (branch) => api.get(`/analytics/syllabus/${branch}`),
 }
 
+export const leaderboardAPI = {
+  list: (params) => api.get('/leaderboard', { params }),
+  updateCPUsernames: (data) => api.put('/leaderboard/usernames', data),
+  refreshCPStats: () => api.post('/leaderboard/refresh'),
+}
+
 export default api

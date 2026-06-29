@@ -11,6 +11,7 @@ import AITools from './pages/AITools'
 import Dashboard from './pages/Dashboard'
 import Bookmarks from './pages/Bookmarks'
 import Syllabus from './pages/Syllabus'
+import Leaderboard from './pages/Leaderboard'
 
 export default function App() {
   return (
@@ -28,6 +29,7 @@ export default function App() {
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="bookmarks" element={<Bookmarks />} />
             <Route path="syllabus" element={<Syllabus />} />
+            <Route path="leaderboard" element={<Leaderboard />} />
           </Route>
         </Routes>
       </BrowserRouter>
