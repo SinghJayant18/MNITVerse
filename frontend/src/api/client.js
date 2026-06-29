@@ -38,10 +38,10 @@ export const bookmarksAPI = {
 }
 
 export const aiAPI = {
-  summarize: (text) => api.post('/summarize', { text }),
-  analyzePYQ: (text) => api.post('/ai/analyze-pyq', { text }),
-  vivaQuestions: (text, count = 5) =>
-    api.post('/ai/viva-questions', { text, count }),
+  summarize: (text, apiKey) => api.post('/summarize', { text, api_key: apiKey }),
+  analyzePYQ: (text, apiKey) => api.post('/ai/analyze-pyq', { text, api_key: apiKey }),
+  vivaQuestions: (text, apiKey, count = 5) =>
+    api.post('/ai/viva-questions', { text, api_key: apiKey, count }),
 }
 
 export const analyticsAPI = {

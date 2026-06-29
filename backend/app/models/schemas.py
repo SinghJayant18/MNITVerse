@@ -72,6 +72,7 @@ class RatingCreate(BaseModel):
 
 class TextInput(BaseModel):
     text: str = Field(min_length=10)
+    api_key: str = Field(min_length=10, description="User's Gemini API key")
 
 
 class SummarizeResponse(BaseModel):
@@ -86,6 +87,7 @@ class PYQAnalysisResponse(BaseModel):
 
 class VivaRequest(BaseModel):
     text: str = Field(min_length=10)
+    api_key: str = Field(min_length=10, description="User's Gemini API key")
     count: int = Field(default=5, ge=1, le=20)
 
 

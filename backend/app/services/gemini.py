@@ -2,50 +2,47 @@ import json
 import re
 
 import google.generativeai as genai
-
-from app.config import settings
-
-_model: genai.GenerativeModel | None = None
+from fastapi import HTTPException, status
 
 
-def _get_model() -> genai.GenerativeModel:
-    global _model
-    if _model is None:
-        genai.configure(api_key=settings.gemini_api_key)
-        _model = genai.GenerativeModel("gemini-2.5-flash")
-    return _model
+def _get_model(api_key: str) -> genai.GenerativeModel:
+    genai.configure(api_key=api_key)
+    return genai.GenerativeModel("gemini-2.5-flash")
 
 
-def _fallback_summary(text: str) -> str:
-    sentences = re.split(r"[.!?]+", text)
-    key = [s.strip() for s in sentences if len(s.strip()) > 20][:5]
-    return " ".join(key) if key else text[:500]
+def _require_key(api_key: str | None) -> str:
+    key = (api_key or "").strip()
+    if not key:
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST,
+            "Gemini API key is required. Paste your key in the AI Tools page.",
+        )
+    return key
 
 
-async def summarize_text(text: str) -> str:
-    if not settings.gemini_api_key:
-        return _fallback_summary(text)
+async def summarize_text(text: str, api_key: str) -> str:
+    key = _require_key(api_key)
     try:
-        model = _get_model()
+        model = _get_model(key)
         prompt = (
             "Summarize the following academic notes for a college student. "
             "Use bullet points and highlight key concepts:\n\n" + text[:8000]
         )
         response = model.generate_content(prompt)
         return response.text.strip()
-    except Exception:
-        return _fallback_summary(text)
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(
+            status.HTTP_502_BAD_GATEWAY,
+            f"Gemini API error: {exc}. Check your API key and try again.",
+        ) from exc
 
 
-async def analyze_pyq(text: str) -> dict:
-    if not settings.gemini_api_key:
-        return {
-            "analysis": "Configure GEMINI_API_KEY for AI-powered PYQ analysis.",
-            "important_topics": ["Topic extraction requires Gemini API"],
-            "difficulty": "Unknown",
-        }
+async def analyze_pyq(text: str, api_key: str) -> dict:
+    key = _require_key(api_key)
     try:
-        model = _get_model()
+        model = _get_model(key)
         prompt = (
             "Analyze this previous year exam paper (PYQ). Return ONLY valid JSON "
             'with keys: "analysis" (string, 2-3 paragraphs), '
@@ -58,22 +55,24 @@ async def analyze_pyq(text: str) -> dict:
             raw = re.sub(r"^```(?:json)?\n?", "", raw)
             raw = re.sub(r"\n?```$", "", raw)
         return json.loads(raw)
-    except Exception:
-        return {
-            "analysis": "Could not parse AI response. Try again with clearer text.",
-            "important_topics": [],
-            "difficulty": "Unknown",
-        }
+    except HTTPException:
+        raise
+    except json.JSONDecodeError as exc:
+        raise HTTPException(
+            status.HTTP_502_BAD_GATEWAY,
+            "Could not parse AI response. Try again with clearer text.",
+        ) from exc
+    except Exception as exc:
+        raise HTTPException(
+            status.HTTP_502_BAD_GATEWAY,
+            f"Gemini API error: {exc}. Check your API key and try again.",
+        ) from exc
 
 
-async def generate_viva_questions(text: str, count: int = 5) -> list[str]:
-    if not settings.gemini_api_key:
-        return [
-            f"Explain the main concept covered in this material. (Q{i + 1})"
-            for i in range(count)
-        ]
+async def generate_viva_questions(text: str, api_key: str, count: int = 5) -> list[str]:
+    key = _require_key(api_key)
     try:
-        model = _get_model()
+        model = _get_model(key)
         prompt = (
             f"Generate exactly {count} viva voce exam questions based on this "
             "academic content. Return ONLY a JSON array of question strings:\n\n"
@@ -87,8 +86,11 @@ async def generate_viva_questions(text: str, count: int = 5) -> list[str]:
         questions = json.loads(raw)
         if isinstance(questions, list):
             return [str(q) for q in questions[:count]]
-    except Exception:
-        pass
-    return [
-        f"What are the key points from this topic? (Q{i + 1})" for i in range(count)
-    ]
+        raise ValueError("Expected JSON array")
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(
+            status.HTTP_502_BAD_GATEWAY,
+            f"Gemini API error: {exc}. Check your API key and try again.",
+        ) from exc
