@@ -1,3 +1,5 @@
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import { useEffect, useState } from 'react'
 import { aiAPI } from '../api/client'
 
@@ -117,11 +119,10 @@ export default function AITools() {
           <button
             key={tab.id}
             onClick={() => { setActiveTab(tab.id); setResult(null) }}
-            className={`rounded-xl px-4 py-2.5 text-sm font-medium transition ${
-              activeTab === tab.id
+            className={`rounded-xl px-4 py-2.5 text-sm font-medium transition ${activeTab === tab.id
                 ? 'bg-brand-600 text-white'
                 : 'glass text-slate-400 hover:text-white'
-            }`}
+              }`}
           >
             {tab.label}
           </button>
@@ -171,8 +172,17 @@ export default function AITools() {
         <div className="glass mt-6 rounded-2xl p-6">
           <h2 className="mb-4 text-lg font-semibold text-white">Result</h2>
           {result.type === 'summarize' && (
-            <div className="whitespace-pre-wrap text-sm leading-relaxed text-slate-300">
-              {result.data}
+            <div className="prose prose-invert prose-sm max-w-none
+                  prose-headings:text-white
+                  prose-strong:text-brand-300
+                  prose-li:text-slate-300
+                  prose-p:text-slate-300
+                  prose-code:text-green-300
+                  prose-pre:bg-slate-900
+                  prose-pre:border prose-pre:border-slate-700">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {result.data}
+              </ReactMarkdown>
             </div>
           )}
           {result.type === 'pyq' && (

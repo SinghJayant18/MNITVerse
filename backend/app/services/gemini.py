@@ -24,10 +24,25 @@ async def summarize_text(text: str, api_key: str) -> str:
     key = _require_key(api_key)
     try:
         model = _get_model(key)
-        prompt = (
-            "Summarize the following academic notes for a college student. "
-            "Use bullet points and highlight key concepts:\n\n" + text[:8000]
-        )
+        prompt = f"""
+You are an expert college tutor.
+
+Summarize the following academic notes in BEAUTIFUL MARKDOWN format.
+
+Rules:
+- Use ## and ### headings
+- Use bullet points wherever possible
+- Use **bold** for important concepts and definitions
+- Use tables if useful
+- Use code blocks for examples
+- Add a short "Key Takeaways" section at the end
+- Keep explanations concise and student-friendly
+- Return ONLY markdown, no extra text
+
+Notes:
+
+{text[:8000]}
+"""
         response = model.generate_content(prompt)
         return response.text.strip()
     except HTTPException:
@@ -43,12 +58,34 @@ async def analyze_pyq(text: str, api_key: str) -> dict:
     key = _require_key(api_key)
     try:
         model = _get_model(key)
-        prompt = (
-            "Analyze this previous year exam paper (PYQ). Return ONLY valid JSON "
-            'with keys: "analysis" (string, 2-3 paragraphs), '
-            '"important_topics" (array of 5-8 topic strings), '
-            '"difficulty" (Easy/Medium/Hard):\n\n' + text[:8000]
-        )
+        prompt = f"""
+Analyze the following Previous Year Question Paper (PYQ).
+
+Return ONLY valid JSON in this exact format:
+
+{{
+    "analysis": "2-3 paragraph markdown analysis",
+    "important_topics": [
+        "Topic 1",
+        "Topic 2",
+        "Topic 3",
+        "Topic 4",
+        "Topic 5"
+    ],
+    "difficulty": "Easy"
+}}
+
+Rules:
+- analysis should explain question patterns, frequently asked concepts, and preparation tips.
+- difficulty must be exactly one of:
+  Easy, Medium, Hard
+- important_topics must contain 5-8 short topic names.
+- Do NOT wrap the JSON in markdown code blocks.
+
+PYQ:
+
+{text[:8000]}
+"""
         response = model.generate_content(prompt)
         raw = response.text.strip()
         if raw.startswith("```"):
@@ -73,11 +110,28 @@ async def generate_viva_questions(text: str, api_key: str, count: int = 5) -> li
     key = _require_key(api_key)
     try:
         model = _get_model(key)
-        prompt = (
-            f"Generate exactly {count} viva voce exam questions based on this "
-            "academic content. Return ONLY a JSON array of question strings:\n\n"
-            + text[:8000]
-        )
+        prompt = f"""
+Generate exactly {count} viva voce questions from the following academic content.
+
+Rules:
+- Questions should range from easy to difficult.
+- Include conceptual and application-based questions.
+- Return ONLY a valid JSON array.
+- Do NOT add explanations.
+- Do NOT use markdown.
+
+Example:
+
+[
+    "What is normalization in DBMS?",
+    "Explain ACID properties.",
+    "Difference between process and thread?"
+]
+
+Content:
+
+{text[:8000]}
+"""
         response = model.generate_content(prompt)
         raw = response.text.strip()
         if raw.startswith("```"):
