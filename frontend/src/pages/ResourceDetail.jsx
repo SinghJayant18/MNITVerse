@@ -8,6 +8,8 @@ export default function ResourceDetail() {
   const { user } = useAuth()
   const [resource, setResource] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [downloading, setDownloading] = useState(false)
+  const [downloadError, setDownloadError] = useState('')
 
   useEffect(() => {
     resourcesAPI
@@ -29,6 +31,21 @@ export default function ResourceDetail() {
       }
     } catch {
       /* ignore */
+    }
+  }
+
+  const handleDownload = async () => {
+    setDownloadError('')
+    setDownloading(true)
+    try {
+      await resourcesAPI.triggerDownload(id, resource.title)
+      setResource((prev) => ({ ...prev, downloads: prev.downloads + 1 }))
+    } catch (err) {
+      setDownloadError(
+        err.message || err.response?.data?.detail || 'Download failed. Please try again.',
+      )
+    } finally {
+      setDownloading(false)
     }
   }
 
@@ -59,13 +76,14 @@ export default function ResourceDetail() {
         </div>
 
         <div className="flex flex-wrap gap-3">
-          <a
-            href={resourcesAPI.download(id)}
+          <button
+            type="button"
+            onClick={handleDownload}
+            disabled={downloading}
             className="btn-primary"
-            download
           >
-            ⬇ Download File
-          </a>
+            {downloading ? 'Downloading...' : '⬇ Download File'}
+          </button>
           {user && (
             <button onClick={toggleBookmark} className="btn-secondary">
               {resource.bookmarked ? '⭐ Bookmarked' : '☆ Bookmark'}
@@ -75,6 +93,9 @@ export default function ResourceDetail() {
             🤖 Analyze with AI
           </Link>
         </div>
+        {downloadError && (
+          <p className="mt-3 text-sm text-red-300">{downloadError}</p>
+        )}
       </div>
     </div>
   )

@@ -27,7 +27,36 @@ export const resourcesAPI = {
     api.post('/resources', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     }),
-    download: (id) => `${BASE_URL}/resources/${id}/download`,
+  download: (id) => `${BASE_URL}/resources/${id}/download`,
+  triggerDownload: async (id, title) => {
+    try {
+      const response = await api.get(`/resources/${id}/download`, {
+        responseType: 'blob',
+      })
+      const disposition = response.headers['content-disposition'] || ''
+      const match = disposition.match(/filename="?([^";\n]+)"?/)
+      const filename = match?.[1] || `${title || 'resource'}.pdf`
+      const url = window.URL.createObjectURL(new Blob([response.data]))
+      const link = document.createElement('a')
+      link.href = url
+      link.setAttribute('download', filename)
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      window.URL.revokeObjectURL(url)
+    } catch (err) {
+      if (err.response?.data instanceof Blob) {
+        const text = await err.response.data.text()
+        try {
+          const json = JSON.parse(text)
+          throw new Error(json.detail || 'Download failed')
+        } catch (parseErr) {
+          if (parseErr.message && parseErr.message !== 'Download failed') throw parseErr
+        }
+      }
+      throw err
+    }
+  },
   rate: (id, rating) => api.post(`/resources/${id}/rate`, { rating }),
 }
 

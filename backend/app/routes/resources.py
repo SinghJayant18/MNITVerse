@@ -18,6 +18,14 @@ router = APIRouter(prefix="/resources", tags=["resources"])
 ALLOWED_EXTENSIONS = {".pdf", ".doc", ".docx", ".ppt", ".pptx", ".txt", ".zip"}
 
 
+def _resolve_filepath(doc: dict) -> str:
+    stored = doc.get("stored_path")
+    if stored and os.path.isfile(stored):
+        return stored
+    filepath = os.path.join(settings.upload_dir, doc["filename"])
+    return os.path.abspath(filepath)
+
+
 async def _bookmark_set(user_id: str | None) -> set[str]:
     if not user_id:
         return set()
@@ -141,6 +149,12 @@ async def upload_resource(
     async with aiofiles.open(filepath, "wb") as f:
         await f.write(content)
 
+    if not os.path.exists(filepath) or os.path.getsize(filepath) != len(content):
+        raise HTTPException(
+            status.HTTP_500_INTERNAL_SERVER_ERROR,
+            "Failed to save file on server. Please try uploading again.",
+        )
+
     db = get_db()
     user = await db.users.find_one({"_id": oid(user_id)})
     doc = {
@@ -151,6 +165,7 @@ async def upload_resource(
         "semester": semester,
         "resource_type": resource_type,
         "filename": safe_name,
+        "stored_path": os.path.abspath(filepath),
         "original_filename": file.filename,
         "file_size": len(content),
         "uploader_id": user_id,
@@ -172,9 +187,12 @@ async def download_resource(resource_id: str):
     if not doc:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Resource not found")
 
-    filepath = os.path.join(settings.upload_dir, doc["filename"])
-    if not os.path.exists(filepath):
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "File not found on server")
+    filepath = _resolve_filepath(doc)
+    if not os.path.isfile(filepath):
+        raise HTTPException(
+            status.HTTP_404_NOT_FOUND,
+            "File missing on server. Please re-upload this resource.",
+        )
 
     await db.resources.update_one(
         {"_id": oid(resource_id)}, {"$inc": {"downloads": 1}}
@@ -183,6 +201,9 @@ async def download_resource(resource_id: str):
         filepath,
         filename=doc.get("original_filename", doc["filename"]),
         media_type="application/octet-stream",
+        headers={
+            "Content-Disposition": f'attachment; filename="{doc.get("original_filename", doc["filename"])}"'
+        },
     )
 
 

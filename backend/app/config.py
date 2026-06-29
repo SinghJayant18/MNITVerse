@@ -1,4 +1,9 @@
+from pathlib import Path
+
+from pydantic import field_validator
 from pydantic_settings import BaseSettings
+
+BACKEND_ROOT = Path(__file__).resolve().parent.parent
 
 
 class Settings(BaseSettings):
@@ -6,8 +11,16 @@ class Settings(BaseSettings):
     jwt_secret: str = "eduvault-dev-secret-change-in-production"
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 10080
-    upload_dir: str = "uploads"
+    upload_dir: str = str(BACKEND_ROOT / "uploads")
     cors_origins: str = "http://localhost:5173,http://127.0.0.1:5173"
+
+    @field_validator("upload_dir", mode="after")
+    @classmethod
+    def resolve_upload_dir(cls, value: str) -> str:
+        path = Path(value)
+        if path.is_absolute():
+            return str(path)
+        return str((BACKEND_ROOT / path).resolve())
 
     @property
     def cors_origin_list(self) -> list[str]:
