@@ -47,7 +47,7 @@ if os.path.isdir(settings.upload_dir):
 
 @app.post("/summarize", response_model=SummarizeResponse)
 async def summarize(data: TextInput):
-    summary = await summarize_text(data.text)
+    summary = await summarize_text(data.text, data.api_key)
     return SummarizeResponse(summary=summary)
 
 
