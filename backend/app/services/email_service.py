@@ -99,11 +99,13 @@ def send_verification_email(to_email: str, otp_code: str, name: str = "Student")
         msg.attach(MIMEText(text_body, "plain"))
         msg.attach(MIMEText(html_body, "html"))
 
-        # Try secure SSL connection if port is 465, otherwise fall back to TLS (port 587)
-        if str(settings.smtp_port) == "465":
-            server = smtplib.SMTP_SSL(settings.smtp_host, settings.smtp_port, timeout=10)
+        # Render/Cloud systems blocks standard raw connections.
+        # We enforce SMTP_SSL for port 465, or standard SMTP for other ports (like 587) with ehlo handshake.
+        port = int(settings.smtp_port)
+        if port == 465:
+            server = smtplib.SMTP_SSL(settings.smtp_host, port, timeout=15)
         else:
-            server = smtplib.SMTP(settings.smtp_host, settings.smtp_port, timeout=10)
+            server = smtplib.SMTP(settings.smtp_host, port, timeout=15)
             server.ehlo()
             server.starttls()
             server.ehlo()
