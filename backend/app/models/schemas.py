@@ -4,7 +4,8 @@ from typing import Literal
 from pydantic import BaseModel, EmailStr, Field
 
 Branch = Literal[
-    "CSE", "IT", "ECE", "EEE", "ME", "CE", "AI/ML", "Data Science", "Other"
+    "CSE", "ECE", "EE", "ME", "CE", "CHE", "MME", "AI", "BARCH",
+    "IT", "EEE", "AI/ML", "Data Science", "Other",  # legacy values
 ]
 ResourceType = Literal["notes", "pyq", "book", "syllabus", "lab", "other"]
 Year = Literal["1", "2", "3", "4"]
@@ -21,11 +22,6 @@ class UserCreate(BaseModel):
 class UserLogin(BaseModel):
     email: EmailStr
     password: str
-
-
-class VerifyOTPRequest(BaseModel):
-    email: EmailStr
-    otp: str
 
 
 class CPStats(BaseModel):

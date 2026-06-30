@@ -11,7 +11,8 @@ const branches = [
   'CE',
   'CHE',
   'MME',
-  'BARCH'
+  'AI',
+  'BARCH',
 ]
 const types = ['', 'notes', 'pyq', 'book', 'syllabus', 'lab', 'other']
 

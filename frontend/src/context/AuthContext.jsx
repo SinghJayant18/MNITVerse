@@ -30,21 +30,10 @@ export function AuthProvider({ children }) {
   }
 
   const register = async (data) => {
-    // Just requests verification email/OTP creation
     const res = await authAPI.register(data)
-    return res.data
-  }
-
-  const verifyOTP = async (email, otp) => {
-    const res = await authAPI.verifyOTP({ email, otp })
     localStorage.setItem('token', res.data.access_token)
     setUser(res.data.user)
     return res.data.user
-  }
-
-  const resendOTP = async (email) => {
-    const res = await authAPI.resendOTP({ email })
-    return res.data
   }
 
   const logout = () => {
@@ -53,7 +42,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, verifyOTP, resendOTP, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   )
