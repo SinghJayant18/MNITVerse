@@ -27,10 +27,16 @@ app = FastAPI(
     lifespan=lifespan,
 )
 print("CORS ORIGINS LOADED:", settings.cors_origin_list)
+
+# If wildcard '*' is in allowed origins, we must set allow_credentials=False for browser security standards,
+# otherwise browsers reject CORS requests with credentials.
+origins = settings.cors_origin_list
+allow_all = "*" in origins or not origins
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.cors_origin_list,
-    allow_credentials=True,
+    allow_origins=["*"] if allow_all else origins,
+    allow_credentials=False if allow_all else True,
     allow_methods=["*"],
     allow_headers=["*"],
     expose_headers=["Content-Disposition"],

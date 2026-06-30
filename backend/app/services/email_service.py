@@ -99,16 +99,22 @@ def send_verification_email(to_email: str, otp_code: str, name: str = "Student")
         msg.attach(MIMEText(text_body, "plain"))
         msg.attach(MIMEText(html_body, "html"))
 
-        with smtplib.SMTP(settings.smtp_host, settings.smtp_port) as server:
+        # Try secure SSL connection if port is 465, otherwise fall back to TLS (port 587)
+        if str(settings.smtp_port) == "465":
+            server = smtplib.SMTP_SSL(settings.smtp_host, settings.smtp_port, timeout=10)
+        else:
+            server = smtplib.SMTP(settings.smtp_host, settings.smtp_port, timeout=10)
             server.ehlo()
             server.starttls()
             server.ehlo()
+            
+        with server:
             server.login(settings.smtp_user, settings.smtp_password)
             server.sendmail(msg["From"], [to_email], msg.as_string())
-
+ 
         print(f"[EMAIL] Verification email sent to {to_email}")
         return True
-
+ 
     except Exception as e:
         print(f"[EMAIL ERROR] Failed to send to {to_email}: {e}")
         return False
