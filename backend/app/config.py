@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     smtp_user: str = ""
     smtp_password: str = ""
     smtp_from_email: str = ""
+    resend_api_key: str = ""
 
     @field_validator("upload_dir", mode="after")
     @classmethod

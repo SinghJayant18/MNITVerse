@@ -11,19 +11,9 @@ def generate_otp() -> str:
     return str(random.randint(100000, 999999))
 
 
-def send_verification_email(to_email: str, otp_code: str, name: str = "Student") -> bool:
-    """Send an OTP verification email using SMTP.
-
-    Returns True if the email was sent successfully, False otherwise.
-    """
-    is_placeholder = "YOUR_EMAIL_HERE" in settings.smtp_user or "YOUR_GMAIL_APP_PASSWORD" in settings.smtp_password
-    if not settings.smtp_user or not settings.smtp_password or is_placeholder:
-        print(f"\n=======================================================")
-        print(f"🔑 [DEV MODE] MNITVerse OTP Verification Code for {to_email}: {otp_code}")
-        print(f"=======================================================\n")
-        return True  # Fallback to dev mode: allow registration to proceed
-
-    html_body = f"""
+def _build_html(name: str, otp_code: str) -> str:
+    """Build the styled HTML email body."""
+    return f"""
     <!DOCTYPE html>
     <html>
     <head>
@@ -80,6 +70,29 @@ def send_verification_email(to_email: str, otp_code: str, name: str = "Student")
     </html>
     """
 
+
+def _send_via_resend(to_email: str, otp_code: str, name: str, html_body: str) -> bool:
+    """Send email using Resend HTTP API (works on Render/cloud platforms)."""
+    try:
+        import resend
+        resend.api_key = settings.resend_api_key
+
+        params = {
+            "from": "MNITVERSE <onboarding@resend.dev>",
+            "to": [to_email],
+            "subject": f"🔐 MNITVerse Verification Code: {otp_code}",
+            "html": html_body,
+        }
+        email = resend.Emails.send(params)
+        print(f"[EMAIL-RESEND] Verification email sent to {to_email} (id: {email.get('id', 'N/A')})")
+        return True
+    except Exception as e:
+        print(f"[EMAIL-RESEND ERROR] Failed to send to {to_email}: {e}")
+        return False
+
+
+def _send_via_smtp(to_email: str, otp_code: str, name: str, html_body: str) -> bool:
+    """Send email using SMTP (works on localhost)."""
     try:
         msg = MIMEMultipart("alternative")
         msg["Subject"] = f"🔐 MNITVerse Verification Code: {otp_code}"
@@ -88,7 +101,6 @@ def send_verification_email(to_email: str, otp_code: str, name: str = "Student")
         msg["From"] = f'"{sender_name}" <{sender_email}>'
         msg["To"] = to_email
 
-        # Plain-text fallback
         text_body = (
             f"Hi {name},\n\n"
             f"Your MNITVerse verification code is: {otp_code}\n\n"
@@ -99,8 +111,6 @@ def send_verification_email(to_email: str, otp_code: str, name: str = "Student")
         msg.attach(MIMEText(text_body, "plain"))
         msg.attach(MIMEText(html_body, "html"))
 
-        # Render/Cloud systems blocks standard raw connections.
-        # We enforce SMTP_SSL for port 465, or standard SMTP for other ports (like 587) with ehlo handshake.
         port = int(settings.smtp_port)
         if port == 465:
             server = smtplib.SMTP_SSL(settings.smtp_host, port, timeout=15)
@@ -109,14 +119,43 @@ def send_verification_email(to_email: str, otp_code: str, name: str = "Student")
             server.ehlo()
             server.starttls()
             server.ehlo()
-            
+
         with server:
             server.login(settings.smtp_user, settings.smtp_password)
             server.sendmail(msg["From"], [to_email], msg.as_string())
- 
-        print(f"[EMAIL] Verification email sent to {to_email}")
+
+        print(f"[EMAIL-SMTP] Verification email sent to {to_email}")
         return True
- 
     except Exception as e:
-        print(f"[EMAIL ERROR] Failed to send to {to_email}: {e}")
+        print(f"[EMAIL-SMTP ERROR] Failed to send to {to_email}: {e}")
         return False
+
+
+def send_verification_email(to_email: str, otp_code: str, name: str = "Student") -> bool:
+    """Send an OTP verification email.
+
+    Priority:
+    1. Resend API (HTTP-based, works on cloud platforms like Render)
+    2. SMTP (works on localhost with Gmail credentials)
+    3. Dev mode fallback (prints OTP to console)
+    """
+    html_body = _build_html(name, otp_code)
+
+    # Priority 1: Resend API (for production / cloud deployments)
+    if settings.resend_api_key:
+        return _send_via_resend(to_email, otp_code, name, html_body)
+
+    # Priority 2: SMTP (for localhost development with real Gmail)
+    has_smtp = settings.smtp_user and settings.smtp_password
+    is_placeholder = has_smtp and (
+        "YOUR_EMAIL_HERE" in settings.smtp_user
+        or "YOUR_GMAIL_APP_PASSWORD" in settings.smtp_password
+    )
+    if has_smtp and not is_placeholder:
+        return _send_via_smtp(to_email, otp_code, name, html_body)
+
+    # Priority 3: Dev mode fallback
+    print(f"\n=======================================================")
+    print(f"🔑 [DEV MODE] MNITVerse OTP Verification Code for {to_email}: {otp_code}")
+    print(f"=======================================================\n")
+    return True
