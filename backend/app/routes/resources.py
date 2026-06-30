@@ -2,14 +2,14 @@ import os
 import uuid
 from datetime import datetime, timezone
 
-import aiofiles
 from bson import ObjectId
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, StreamingResponse
 
 from app.config import settings
 from app.database import get_db
 from app.models.schemas import RatingCreate, ResourceResponse
+from app.services import file_storage
 from app.utils.deps import get_current_user_id, get_optional_user_id
 from app.utils.helpers import oid, serialize_resource
 
@@ -140,20 +140,20 @@ async def upload_resource(
 
     os.makedirs(settings.upload_dir, exist_ok=True)
     safe_name = f"{uuid.uuid4().hex}{ext}"
-    filepath = os.path.join(settings.upload_dir, safe_name)
 
     content = await file.read()
     if len(content) > 20 * 1024 * 1024:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "File too large (max 20MB)")
 
-    async with aiofiles.open(filepath, "wb") as f:
-        await f.write(content)
-
-    if not os.path.exists(filepath) or os.path.getsize(filepath) != len(content):
-        raise HTTPException(
-            status.HTTP_500_INTERNAL_SERVER_ERROR,
-            "Failed to save file on server. Please try uploading again.",
-        )
+    # Store in MongoDB GridFS (persists on Render — local disk is ephemeral)
+    gridfs_id = await file_storage.save_file(
+        content,
+        safe_name,
+        metadata={
+            "original_filename": file.filename or safe_name,
+            "content_type": file.content_type or "application/octet-stream",
+        },
+    )
 
     db = get_db()
     user = await db.users.find_one({"_id": oid(user_id)})
@@ -165,7 +165,7 @@ async def upload_resource(
         "semester": semester,
         "resource_type": resource_type,
         "filename": safe_name,
-        "stored_path": os.path.abspath(filepath),
+        "gridfs_id": gridfs_id,
         "original_filename": file.filename,
         "file_size": len(content),
         "uploader_id": user_id,
@@ -187,25 +187,39 @@ async def download_resource(resource_id: str):
     if not doc:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Resource not found")
 
-    filepath = _resolve_filepath(doc)
-    if not os.path.isfile(filepath):
-        raise HTTPException(
-            status.HTTP_404_NOT_FOUND,
-            "File missing on server. Please re-upload this resource.",
-        )
+    original_name = doc.get("original_filename", doc["filename"])
 
     await db.resources.update_one(
         {"_id": oid(resource_id)}, {"$inc": {"downloads": 1}}
     )
-    original_name = doc.get("original_filename", doc["filename"])
-    return FileResponse(
-        filepath,
-        filename=original_name,
-        media_type="application/octet-stream",
-        headers={
-            "Content-Disposition": f'attachment; filename="{original_name}"',
-            "Access-Control-Expose-Headers": "Content-Disposition",
-        },
+
+    headers = {
+        "Content-Disposition": f'attachment; filename="{original_name}"',
+        "Access-Control-Expose-Headers": "Content-Disposition",
+    }
+
+    # Primary: MongoDB GridFS (works on Render)
+    gridfs_id = doc.get("gridfs_id")
+    if gridfs_id and await file_storage.file_exists(gridfs_id):
+        return StreamingResponse(
+            file_storage.stream_file(gridfs_id),
+            media_type="application/octet-stream",
+            headers=headers,
+        )
+
+    # Legacy fallback: local disk (older uploads before GridFS)
+    filepath = _resolve_filepath(doc)
+    if os.path.isfile(filepath):
+        return FileResponse(
+            filepath,
+            filename=original_name,
+            media_type="application/octet-stream",
+            headers=headers,
+        )
+
+    raise HTTPException(
+        status.HTTP_404_NOT_FOUND,
+        "File missing on server. Please re-upload this resource.",
     )
 
 
