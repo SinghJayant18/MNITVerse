@@ -12,6 +12,7 @@ import Dashboard from './pages/Dashboard'
 import Bookmarks from './pages/Bookmarks'
 import Syllabus from './pages/Syllabus'
 import Leaderboard from './pages/Leaderboard'
+import PlacementResources from './pages/PlacementResources'
 
 export default function App() {
   return (
@@ -30,6 +31,7 @@ export default function App() {
             <Route path="bookmarks" element={<Bookmarks />} />
             <Route path="syllabus" element={<Syllabus />} />
             <Route path="leaderboard" element={<Leaderboard />} />
+            <Route path="placement" element={<PlacementResources />} />
           </Route>
         </Routes>
       </BrowserRouter>
