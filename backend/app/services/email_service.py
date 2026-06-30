@@ -44,16 +44,16 @@ def send_verification_email(to_email: str, otp_code: str, name: str = "Student")
 
             <!-- Body -->
             <div style="padding:32px 24px;">
-                <p style="color:#cbd5e1; font-size:15px; margin:0 0 16px; line-height:1.6;">
-                    Hi <strong style="color:#fff;">{name}</strong>,
+                <p style="color:#f1f5f9; font-size:15px; margin:0 0 16px; line-height:1.6;">
+                    Hi {name},
                 </p>
-                <p style="color:#cbd5e1; font-size:15px; margin:0 0 24px; line-height:1.6;">
+                <p style="color:#f1f5f9; font-size:15px; margin:0 0 24px; line-height:1.6;">
                     Use the verification code below to complete your registration on MNITVerse:
                 </p>
 
                 <!-- OTP Box -->
                 <div style="background:rgba(249,115,22,0.1); border:2px solid rgba(249,115,22,0.3); border-radius:16px; padding:24px; text-align:center; margin:0 0 24px;">
-                    <p style="margin:0 0 8px; color:#94a3b8; font-size:12px; text-transform:uppercase; letter-spacing:2px; font-weight:600;">
+                    <p style="margin:0 0 8px; color:#f1f5f9; font-size:12px; text-transform:uppercase; letter-spacing:2px; font-weight:600;">
                         Your Verification Code
                     </p>
                     <p style="margin:0; color:#f97316; font-size:36px; font-weight:800; letter-spacing:8px; font-family:monospace;">
@@ -61,10 +61,10 @@ def send_verification_email(to_email: str, otp_code: str, name: str = "Student")
                     </p>
                 </div>
 
-                <p style="color:#64748b; font-size:13px; margin:0 0 8px; line-height:1.5;">
-                    ⏰ This code expires in <strong style="color:#cbd5e1;">10 minutes</strong>.
+                <p style="color:#f1f5f9; font-size:13px; margin:0 0 8px; line-height:1.5;">
+                    ⏰ This code expires in 10 minutes.
                 </p>
-                <p style="color:#64748b; font-size:13px; margin:0; line-height:1.5;">
+                <p style="color:#94a3b8; font-size:13px; margin:0; line-height:1.5;">
                     If you didn't request this, you can safely ignore this email.
                 </p>
             </div>
