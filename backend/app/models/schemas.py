@@ -23,6 +23,11 @@ class UserLogin(BaseModel):
     password: str
 
 
+class VerifyOTPRequest(BaseModel):
+    email: EmailStr
+    otp: str
+
+
 class CPStats(BaseModel):
     lc_solved_easy: int = 0
     lc_solved_medium: int = 0

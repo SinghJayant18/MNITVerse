@@ -10,7 +10,7 @@ const branches = [
   'CE',
   'CHE',
   'MME',
-  'BARCH'
+  'AI'
 ]
 
 export default function Syllabus() {

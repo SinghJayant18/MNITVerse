@@ -597,6 +597,180 @@ SYLLABUS = {
         "Architectural Thesis"
     ]
 },
+   "AI": {
+    "1": [
+        "Mathematics-I",
+        "Basic Economics",
+        "Programming with Python",
+        "Programming with Python Lab",
+        "Discrete Structures",
+        "Problem Solving with C",
+        "Problem Solving with C Lab"
+    ],
+
+    "2": [
+        "Basic Electrical and Electronics Engineering",
+        "Electrical Engineering Lab",
+        "Electronics Engineering Lab",
+        "Data Structures and Algorithms",
+        "Mathematics for AI",
+        "Data Structures and Algorithms Lab"
+    ],
+
+    "3": [
+        "Digital Systems and Computer Architecture",
+        "Algorithm Design",
+        "Operating System Concepts",
+        "Foundations of Data Science",
+        "Automata Theory",
+        "Social Sciences and Professional Ethics",
+        "Data Science Lab",
+        "Algorithm Design Lab",
+        "Operating System Concepts Lab"
+    ],
+
+    "4": [
+        "Artificial Neural Networks",
+        "Introduction to Artificial Intelligence",
+        "Introduction to Compiler Design",
+        "Data Communication and Networks",
+        "Database Management Systems",
+        "Basics of Management",
+        "DCN Lab",
+        "Introduction to Artificial Intelligence Lab",
+        "Database Management Systems Lab",
+        "Open-ended Minor Project"
+    ],
+
+    "5": [
+        "Image Processing",
+        "Principles of Machine Learning",
+        "Big Data Analytics",
+        "Information Retrieval",
+        "Data Mining and Warehousing",
+        "Program Elective-1",
+        "Image Processing Lab",
+        "Principles of Machine Learning Lab",
+        "Data Analytics Lab"
+    ],
+
+    "6": [
+        "Deep Learning",
+        "Natural Language Processing",
+        "High Performance Computing",
+        "Information Security",
+        "Program Elective-2",
+        "Wireless and 5G Communication",
+        "Deep Learning Lab",
+        "Natural Language Processing Lab",
+        "High Performance Computing Lab"
+    ],
+
+    "7": [
+        "Training Seminar",
+        "Minor Project",
+        "Program Elective-3",
+        "Program Elective-4",
+        "Program Elective-5",
+        "Program Elective-5 Lab",
+        "Open Elective-1"
+    ],
+
+    "8": [
+        "Major Project",
+        "Program Elective-6",
+        "Program Elective-7",
+        "Program Elective-7 Lab",
+        "Open Elective-2"
+    ]
+},
+   "AI & DATA ENGINEERING": {
+    "1": [
+        "Mathematics-I",
+        "Basic Economics",
+        "Programming with Python",
+        "Programming with Python Lab",
+        "Discrete Structures",
+        "Problem Solving with C",
+        "Problem Solving with C Lab"
+    ],
+
+    "2": [
+        "Basic Electrical and Electronics Engineering",
+        "Electrical Engineering Lab",
+        "Electronics Engineering Lab",
+        "Data Structures and Algorithms",
+        "Mathematics for AI",
+        "Data Structures and Algorithms Lab"
+    ],
+
+    "3": [
+        "Digital Systems and Computer Architecture",
+        "Algorithm Design",
+        "Operating System Concepts",
+        "Foundations of Data Science",
+        "Automata Theory",
+        "Social Sciences and Professional Ethics",
+        "Data Science Lab",
+        "Algorithm Design Lab",
+        "Operating System Concepts Lab"
+    ],
+
+    "4": [
+        "Artificial Neural Networks",
+        "Introduction to Artificial Intelligence",
+        "Introduction to Compiler Design",
+        "Data Communication and Networks",
+        "Database Management Systems",
+        "Basics of Management",
+        "DCN Lab",
+        "Introduction to Artificial Intelligence Lab",
+        "Database Management Systems Lab",
+        "Open-ended Minor Project"
+    ],
+
+    "5": [
+        "Image Processing",
+        "Principles of Machine Learning",
+        "Big Data Analytics",
+        "Information Retrieval",
+        "Data Mining and Warehousing",
+        "Program Elective-1",
+        "Image Processing Lab",
+        "Principles of Machine Learning Lab",
+        "Data Analytics Lab"
+    ],
+
+    "6": [
+        "Deep Learning",
+        "Natural Language Processing",
+        "High Performance Computing",
+        "Information Security",
+        "Program Elective-2",
+        "Wireless and 5G Communication",
+        "Deep Learning Lab",
+        "Natural Language Processing Lab",
+        "High Performance Computing Lab"
+    ],
+
+    "7": [
+        "Training Seminar",
+        "Minor Project",
+        "Program Elective-3",
+        "Program Elective-4",
+        "Program Elective-5",
+        "Program Elective-5 Lab",
+        "Open Elective-1"
+    ],
+
+    "8": [
+        "Major Project",
+        "Program Elective-6",
+        "Program Elective-7",
+        "Program Elective-7 Lab",
+        "Open Elective-2"
+    ]
+},
 }
 
 

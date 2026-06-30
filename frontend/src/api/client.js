@@ -14,6 +14,8 @@ api.interceptors.request.use((config) => {
 
 export const authAPI = {
   register: (data) => api.post('/auth/register', data),
+  verifyOTP: (data) => api.post('/auth/verify-otp', data),
+  resendOTP: (data) => api.post('/auth/resend-otp', data),
   login: (data) => api.post('/auth/login', data),
   me: () => api.get('/auth/me'),
 }
@@ -45,16 +47,19 @@ export const resourcesAPI = {
       link.remove()
       window.URL.revokeObjectURL(url)
     } catch (err) {
-      if (err.response?.data instanceof Blob) {
-        const text = await err.response.data.text()
-        try {
-          const json = JSON.parse(text)
-          throw new Error(json.detail || 'Download failed')
-        } catch (parseErr) {
-          if (parseErr.message && parseErr.message !== 'Download failed') throw parseErr
-        }
+      console.warn("Blob download failed, attempting direct download fallback...", err)
+      // Fallback: direct download by navigating the window to the download URL
+      try {
+        const downloadUrl = `${BASE_URL}/resources/${id}/download`
+        const link = document.createElement('a')
+        link.href = downloadUrl
+        link.target = '_blank'
+        document.body.appendChild(link)
+        link.click()
+        link.remove()
+      } catch (fallbackErr) {
+        throw new Error('Download failed to start. Please try again.')
       }
-      throw err
     }
   },
   rate: (id, rating) => api.post(`/resources/${id}/rate`, { rating }),

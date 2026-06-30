@@ -197,12 +197,14 @@ async def download_resource(resource_id: str):
     await db.resources.update_one(
         {"_id": oid(resource_id)}, {"$inc": {"downloads": 1}}
     )
+    original_name = doc.get("original_filename", doc["filename"])
     return FileResponse(
         filepath,
-        filename=doc.get("original_filename", doc["filename"]),
+        filename=original_name,
         media_type="application/octet-stream",
         headers={
-            "Content-Disposition": f'attachment; filename="{doc.get("original_filename", doc["filename"])}"'
+            "Content-Disposition": f'attachment; filename="{original_name}"',
+            "Access-Control-Expose-Headers": "Content-Disposition",
         },
     )
 

@@ -13,6 +13,11 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 10080
     upload_dir: str = str(BACKEND_ROOT / "uploads")
     cors_origins: str = "http://localhost:5173,http://127.0.0.1:5173"
+    smtp_host: str = "smtp.gmail.com"
+    smtp_port: int = 587
+    smtp_user: str = ""
+    smtp_password: str = ""
+    smtp_from_email: str = ""
 
     @field_validator("upload_dir", mode="after")
     @classmethod
